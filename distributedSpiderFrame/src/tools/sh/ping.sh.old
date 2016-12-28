@@ -1,0 +1,4 @@
+#!/bin/bash
+#PING=`ping -c 10 $1 | grep '0 received' | wc -l`
+PING=`ping -c $1 $2`
+echo $PING

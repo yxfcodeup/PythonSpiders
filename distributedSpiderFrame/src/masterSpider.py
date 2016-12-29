@@ -67,7 +67,9 @@ class MasterSpider() :
         self.finished = initRedis(settings.data_base["redis"]["finished"]["host"] , settings.data_base["redis"]["finished"]["port"] , settings.data_base["redis"]["finished"]["db"])
 
     def getTask(self) :
-        return "reply" , "new_task"
+        reply = "reply"
+        new_task = json.dumps(new_task)
+        return reply , new_task
 
     def getNewTask(self) :
         reply , new_task = self.getTask()
@@ -88,6 +90,7 @@ class MasterSpider() :
     # @return task_pool 更新后的任务池,约定任务以json格式打包
     # @return reply 返回信息
     # @retrun new_task 此次客户端请求的新任务,约定任务以json格式打包
+    # NOTICE: 此函数内统一不作json处理，在其调用函数内作好json处理
     #--------------------------------------------------------------------------
     def run(self , task_pool , client_ip , req , return_task , return_json , remark_json) :
         new_task = ""
@@ -110,7 +113,6 @@ class MasterSpider() :
                 logger.warning("Reinput task{" + str(task_dict) + "}")
                 reply , new_task = self.reinputTask()
 
-        new_task = json.dumps(new_task)
         task_dict[new_task] = datetime.datetime.now()
         task_pool[client_ip] = task_dict
 

@@ -72,59 +72,40 @@ class MasterSpider() :
         self.undone = initRedis(settings.data_base["redis"]["undone"]["host"] , settings.data_base["redis"]["undone"]["port"] , settings.data_base["redis"]["undone"]["db"])
         self.finished = initRedis(settings.data_base["redis"]["finished"]["host"] , settings.data_base["redis"]["finished"]["port"] , settings.data_base["redis"]["finished"]["db"])
 
-    def getTask(self) :
-        reply = "reply"
-        new_task = json.dumps(new_task)
-        return reply , new_task
+    def __loadDatabase(self , db_type=None) :
+        if None == db_type or "redis" == db_type :
+            pass
+        elif "mysql" == db_type :
+            return False
+        elif "mariadb" == db_type :
+            return False
+        elif "oracle" == db_type :
+            return False
+        else :
+            logger.error("Dose not support this kind of database!")
+            logger.warning("Database list:")
+            logger.warning("\t1. redis")
+            logger.warning("\t2. mysql")
+            logger.warning("\t3. mariadb")
+            logger.warning("\t4. oracle")
+            return False
 
-    def getNewTask(self) :
-        reply , new_task = self.getTask()
-        return reply , new_task
+    def __loadControlers(self) :
+        pass
 
-    def reinputTask(self) :
-        reply , new_task = self.getTask()
-        return reply , new_task
-
-    #--------------------------------------------------------------------------
-    # 对客户端发布任务
-    # @param task_pool 任务池,包含ip对应的任务列表,{ip:{task:start_time,...},...}
-    # @param client_ip 请求任务的客户端ip
-    # @param req request.req 客户端请求信息
-    # @param return_task request.return_task 客户端返回的已完成任务,约定json格式打包
-    # @param return_json request.return_info 客户端返回的任务结果,约定json格式打包
-    # @param remark_json request.remark_info 客户端返回的备注信息,约定json格式打包
-    # @return task_pool 更新后的任务池,约定任务以json格式打包
-    # @return reply 返回信息
-    # @retrun new_task 此次客户端请求的新任务,约定任务以json格式打包
-    # NOTICE: 此函数内统一不作json处理，在其调用函数内作好json处理
-    #--------------------------------------------------------------------------
-    def run(self , task_pool , client_ip , req , return_task , return_json , remark_json) :
+    def run(self , task_dict , client_ip , req , return_task , return_info , remark_info) :
         new_task = ""
-        reply = ""
-        task_dict = {}
-        if client_ip in task_pool :
-            task_dict = task_pool[client_ip]
+        if "" == task_dict[client_ip] :
+            logger.info("Send first task to client[" + str(client_ip) + "]")
         else :
-            logger.warning("The client{" + str(client_ip) + "} is not in the task pool{" + str(task_pool) + "}")
-
-        if 0 == len(task_dict) :
-            logger.info("Send first task to client{" + str(client_ip) + "}")
-            reply , new_task = self.getTask() 
-        else :
-            if return_task in task_dict :
+            if return_task == task_dict[client_ip] :
                 logger.info("Get new task.")
-                reply , new_task = self.getNewTask()
+                #masterSpider.changeTask
             else :
-                logger.error("Task{" + str(return_task) + "} returned from client{" + str(client_ip) + "} is not in task list{" + str(task_dict) + "}")
-                logger.warning("Reinput task{" + str(task_dict) + "}")
-                reply , new_task = self.reinputTask()
+                logger.error("Task[" + str(return_task) + "] returned from client[" + str(client_ip) + "] is not equal to task dict info[" + str(task_dict[client_ip]) + "]")
+                logger.warning("Reinput task[" + str(task_dict[client_ip]) + "]")
+                #masterSpider.reinputTask
 
-        task_dict[new_task] = datetime.datetime.now()
-        task_pool[client_ip] = task_dict
-
-        return task_pool , reply , new_task
-
-        """
         if 0 == self.undone.dbsize() :
             logger.info("No task in the undone redis db[" + str(self.undone) + "]")
             new_task = json.dumps("ending")
@@ -135,4 +116,3 @@ class MasterSpider() :
             task_dict[client_ip] = json.dumps(new_task)
             logger.info("Send task to client[" + str(client_ip) + "]\nTask --> " + str(new_task))
             return task_dict , new_task
-        """

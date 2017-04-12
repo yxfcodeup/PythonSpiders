@@ -23,6 +23,7 @@
 #---------------------------------------------------
 /dataResults
 /dataSources
+/logs
 /__pycache__
 *.log
-
+*.tags

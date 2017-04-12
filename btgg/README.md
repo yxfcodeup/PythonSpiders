@@ -1,4 +1,7 @@
 ## Model
+### Purpose
+Link: [bt.gg](bt.gg)
+
 ### Directory Structure
 #### Files
 * AlternationLog

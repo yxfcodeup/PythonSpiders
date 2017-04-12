@@ -50,8 +50,8 @@ class MasterSpider() :
     def __init__(self , work_dir) :
         self.work_dir = work_dir
         self.storage = None     #存储方式
-        self.undone = None      #未完成的任务集
-        self.finished = None    #已完成的任务集 
+        self.undone = self.__loadDatabase(1 , settings.data_base["redis"]["undone"])      #未完成的任务集
+        self.finished = self.__loadDatabase(1 , settings.data_base["redis"]["finished"])    #已完成的任务集 
 
     #------------------------------------------------------------------------------
     # 加载数据库
@@ -59,18 +59,18 @@ class MasterSpider() :
     # @return bool True，加载成功；False，加载失败
     # NOTICE:
     #------------------------------------------------------------------------------
-    def __loadDatabase(self , db_type=None) :
+    def __loadDatabase(self , db_type=None , db_config=None) :
         if None == db_type or "redis" == db_type or 1 == db_type :
             self.storage = 1
             self.undone = database.initRedis(
-                    settings.data_base["redis"]["undone"]["host"] , 
-                    settings.data_base["redis"]["undone"]["port"] , 
-                    settings.data_base["redis"]["undone"]["db"]
+                    db_config["host"] , 
+                    db_config["port"] ,
+                    db_config["db"]
                     )
             self.finished = database.initRedis(
-                    settings.data_base["redis"]["finished"]["host"] , 
-                    settings.data_base["redis"]["finished"]["port"] , 
-                    settings.data_base["redis"]["finished"]["db"]
+                    db_config["host"] , 
+                    db_config["port"] ,
+                    db_config["db"]
                     )
             return True
         elif "mysql" == db_type or 2 == db_type :

@@ -6,6 +6,11 @@ folder_path = {
     "result":"/dataResults" , 
     }
 """
+folder_path = {
+    "config":"/config" , 
+    "log":"/logs" , 
+    "result":"/dataResults" , 
+    }
 
 #DataBase
 """

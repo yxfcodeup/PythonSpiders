@@ -49,9 +49,10 @@ logger = Log(log_dir , log_file)
 class MasterSpider() :
     def __init__(self , work_dir) :
         self.work_dir = work_dir
-        self.storage = None     #存储方式
-        self.undone = self.__loadDatabase(1 , settings.data_base["redis"]["undone"])      #未完成的任务集
-        self.finished = self.__loadDatabase(1 , settings.data_base["redis"]["finished"])    #已完成的任务集 
+        self.storage = 1     #存储方式
+        self.undone = None      #未完成的任务集
+        self.finished = None    #已完成的任务集 
+        self.__loadDatabase(1 , settings.data_base["redis"])
 
     #------------------------------------------------------------------------------
     # 加载数据库
@@ -63,15 +64,17 @@ class MasterSpider() :
         if None == db_type or "redis" == db_type or 1 == db_type :
             self.storage = 1
             self.undone = database.initRedis(
-                    db_config["host"] , 
-                    db_config["port"] ,
-                    db_config["db"]
+                    db_config["undone"]["host"] , 
+                    db_config["undone"]["port"] ,
+                    db_config["undone"]["db"]
                     )
             self.finished = database.initRedis(
-                    db_config["host"] , 
-                    db_config["port"] ,
-                    db_config["db"]
+                    db_config["finished"]["host"] , 
+                    db_config["finished"]["port"] ,
+                    db_config["finished"]["db"]
                     )
+            logger.info("Load undone[" + str(self.undone) + "] successful!")
+            logger.info("Load finished[" + str(self.finished) + "] successful!")
             return True
         elif "mysql" == db_type or 2 == db_type :
             self.storage = 2

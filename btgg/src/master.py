@@ -181,8 +181,6 @@ class TaskService(service_pb2.TaskServiceServicer) :
         client_ip = ip_info_split[1]
         client_port = ip_info_split[2]
         #standard functions run the task
-        logger.info(":::_SLAVES_ " + str(_SLAVES_))
-        logger.info(":::_TASKS_  " + str(_TASKS_))
         _TASKS_ , reply , new_task = _MSP_.run(_TASKS_ , client_ip , request.req , request.return_task , request.result_json , request.remark_json)
         if "disallow" == reply and client_ip in _SLAVES_ :
             logger.warning("The client[" + str(client_ip) + "] is illigal.We will pop it!")

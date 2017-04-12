@@ -98,14 +98,31 @@ class MasterSpider() :
     def __getNewTask(self) :
         reply = "reply"
         new_task = ""
-        new_task = json.dumps(new_task)
+        task_dict = {}
+        for i in range(10) :
+            _key = (self.undone.randomkey()).decode("utf-8")
+            _val = (self.undone.get(_key)).decode("utf-8")
+            task_dict[_key]  = _val
+            self.undone.delete(_key)
+        new_task = json.dumps(task_dict)
         return reply , new_task
 
     def __changeTask(self , return_task , result_info , remark_info) :
+        task_res = json.loads(result_info)
+        end_time = datetime.datetime.now().strftime("%Y%m%d%H%M")
+        for _key , _val in task_res.items() :
+            self.finished.hset(_key , "url" , _val[0])
+            self.finished.hset(_key , "finished" , _val[1])
+            self.finished.hset(_key , "result" , _val[2])
+            self.finished.hset(_key , "time" , end_time)
+            self.finished.hset(_key , "remark" , remark_info)
         reply , new_task = self.__getNewTask()
         return reply , new_task
     
     def __reinputTask(self , retask) :
+        old_task = json.loads(retask)
+        for _key , _val in old_task.items() :
+            self.undone.set(_key , _val)
         reply , new_task = self.__getNewTask()
         return reply , new_task
 
@@ -150,9 +167,7 @@ class MasterSpider() :
                 logger.warning("Reinput task[" + str(task_dict[client_ip]) + "]")
                 reply , new_task = self.__reinputTask(task_dict[client_ip])
 
-        #if self.__finishTask() :
-        new_task = "test"
-        if False :
+        if self.__finishTask() :
             logger.info("All tasks are finished in the redis db[" + str(self.undone) + "]")
             reply = "end"
             task_dict = {}

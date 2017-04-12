@@ -6,14 +6,6 @@ folder_path = {
     "result":"/dataResults" , 
     }
 """
-folder_path = {
-    "config":"/config" , 
-    "log":"/logs" , 
-    "lib":"/lib" , 
-    "result":"/dataResults" , 
-    "dsource":"/dataSources" ,
-    }
-
 
 #DataBase
 """
@@ -34,13 +26,13 @@ data_base = {
         "redis":{
             "undone":{
                 "host":"192.168.1.111" , 
-                "port":"6380" , 
-                "db":"1" , 
+                "port":"6379" , 
+                "db":"7" , 
                 } ,
             "finished":{
                 "host":"192.168.1.111" , 
-                "port":"6380" , 
-                "db":"2" , 
+                "port":"6379" , 
+                "db":"8" , 
                 } , 
             } ,
         }
